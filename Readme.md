@@ -51,3 +51,11 @@
              </h1>;
     }
     for rendering component ==> root.render(<HeadingComponent />)
+
+    # Hooks
+    - Simple Javascript functions provided by React
+    - useState, useEffect etc.
+    - Whenever we use useState Hook component re-renders
+
+    # React Fiber
+    https://github.com/acdlite/react-fiber-architecture
