@@ -1,55 +1,85 @@
 import RestaurantCard from "./RestaurantCard";
 import resObj from "../utils/mockData";
 import { useEffect, useState } from "react";
+import Shimmer from "./Shimmer";
+import { RES_API } from "../utils/constants";
 
 const Body = () => {
   const [resList, setResList] = useState([]);
+  const [filteredResList, setFilteredResList] = useState([]);
+
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const data = await fetch(
-      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=28.622227&lng=77.2505733&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
-    );
+    const data = await fetch(RES_API);
     const jsonData = await data.json();
-    // console.log(jsonData);
+
+    // console.log('ress==>>',JSON.stringify(jsonData));
     setResList(
+      jsonData.data.cards[4].card.card.gridElements.infoWithStyle.restaurants
+    );
+    setFilteredResList(
       jsonData.data.cards[4].card.card.gridElements.infoWithStyle.restaurants
     );
   };
 
-  return (
+  return resList.length === 0 ? (
+    <Shimmer />
+  ) : (
     <div className="body">
       <div className="filter">
+        <div className="search-bar">
+          <input
+            className="search-input"
+            value={searchText}
+            onChange={(event) => {
+              setSearchText(event.target.value);
+            }}
+          />
+          <button
+            className="search-btn"
+            onClick={() => {
+              const searchedResList = resList.filter(res => {
+                return res?.info?.name.toLowerCase().includes(searchText.toLowerCase());
+              });
+              setFilteredResList(searchedResList);
+            }}
+          >
+            Search
+          </button>
+        </div>
         <button
           className="filter-btn"
           onClick={() => {
-            let filteredResList = resList.filter((res) => res.info.avgRating >= 4.3);
-            setResList(filteredResList);
+            let filteredRes = resList.filter(
+              (res) => res.info.avgRating >= 4.3
+            );
+            setFilteredResList(filteredRes);
           }}
         >
           4.3 Star and above Restaurant
         </button>
-        {/* <button
+        <button
           className="filter-btn"
           onClick={() => {
-            let filteredResList = resList.filter((res) => res.info.avgRating >= 0);
-            setResList(filteredResList);
+            setFilteredResList(resList);
           }}
         >
           Clear Filter
-        </button> */}
+        </button>
       </div>
       <div className="restaurant-container">
-        {resList.map((item) => {
-        //   console.log(item);
-        //   if (item.info) {
-            return <RestaurantCard key={item.id} item={item.info} />;
-        //   } else {
-        //     return <RestaurantCard key={item.id} item={item} />;
-        //   }
+        {filteredResList.map((item) => {
+            console.log(item);
+          //   if (item.info) {
+          return <RestaurantCard key={item.id} item={item} />;
+          //   } else {
+          //     return <RestaurantCard key={item.id} item={item} />;
+          //   }
         })}
       </div>
     </div>
