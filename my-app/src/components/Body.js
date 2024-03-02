@@ -3,6 +3,7 @@ import resObj from "../utils/mockData";
 import { useEffect, useState } from "react";
 import Shimmer from "./Shimmer";
 import { RES_API } from "../utils/constants";
+import useOnlineStatus from "../utils/useOnlineStatus";
 
 const Body = () => {
   const [resList, setResList] = useState([]);
@@ -18,7 +19,6 @@ const Body = () => {
     const data = await fetch(RES_API);
     const jsonData = await data.json();
 
-    // console.log('ress==>>',JSON.stringify(jsonData));
     setResList(
       jsonData.data.cards[4].card.card.gridElements.infoWithStyle.restaurants
     );
@@ -26,6 +26,11 @@ const Body = () => {
       jsonData.data.cards[4].card.card.gridElements.infoWithStyle.restaurants
     );
   };
+
+  const onlineStatus = useOnlineStatus();
+  if (onlineStatus === false) {
+    return <h1>Internet check karle pyare !!</h1>;
+  }
 
   return resList.length === 0 ? (
     <Shimmer />
@@ -43,8 +48,10 @@ const Body = () => {
           <button
             className="search-btn"
             onClick={() => {
-              const searchedResList = resList.filter(res => {
-                return res?.info?.name.toLowerCase().includes(searchText.toLowerCase());
+              const searchedResList = resList.filter((res) => {
+                return res?.info?.name
+                  .toLowerCase()
+                  .includes(searchText.toLowerCase());
               });
               setFilteredResList(searchedResList);
             }}
@@ -74,12 +81,8 @@ const Body = () => {
       </div>
       <div className="restaurant-container">
         {filteredResList.map((item) => {
-            console.log(item);
-          //   if (item.info) {
+          console.log(item);
           return <RestaurantCard key={item.id} item={item} />;
-          //   } else {
-          //     return <RestaurantCard key={item.id} item={item} />;
-          //   }
         })}
       </div>
     </div>

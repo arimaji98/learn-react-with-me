@@ -2,30 +2,22 @@ import React, { useEffect, useState } from "react";
 import Shimmer from "./Shimmer";
 import { useParams } from "react-router-dom";
 import { MENU_API } from "../utils/constants";
+import useRestaurantMenu from "../utils/useRestaurantMenu";
 
 const RestaurantMenu = () => {
-  const [resMenuDetail, setResMenuDetail] = useState(null);
   const { resId } = useParams();
-  useEffect(() => {
-    fetchMenu();
-  }, []);
-
-  const fetchMenu = async () => {
-    const data = await fetch(MENU_API + resId);
-    const jsonData = await data.json();
-    setResMenuDetail(jsonData.data);
-  };
+  const resMenuDetail = useRestaurantMenu(resId); // Custom Hook
 
   if (resMenuDetail === null) return <Shimmer />;
 
   const { name, cuisines, costForTwoMessage } =
     resMenuDetail?.cards[0]?.card?.card?.info;
     
-  const { itemCards } = resMenuDetail?.cards[2]?.groupedCard?.cardGroupMap
+  const { itemCards } = resMenuDetail?.cards[1]?.groupedCard?.cardGroupMap
     ?.REGULAR?.cards[1]?.card?.card?.categories
-    ? resMenuDetail?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]
+    ? resMenuDetail?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]
         ?.card?.card?.categories[0]
-    : resMenuDetail?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]
+    : resMenuDetail?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]
         ?.card?.card;
 
   return (
